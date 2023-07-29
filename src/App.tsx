@@ -1,26 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import './App.css'
+import InputField from './components/InputField'
+import { Todo } from './components/model';
+import TodoList from './components/TodoList';
+
+const App:React.FC=() => {
+  const[todo,setTodo]=useState<string>("");
+  const [todos, setTodos] = useState<Todo[]>(() => {
+    // Load todos from local storage when the app initializes
+    const storedTodos = localStorage.getItem('todos');
+    return storedTodos ? JSON.parse(storedTodos) : [];
+  });
+  const [completedtodos, setCompletedTodos] = useState<Todo[]>(() => {
+    // Load todos from local storage when the app initializes
+    const storedTodos = localStorage.getItem('completedtodos');
+    return storedTodos ? JSON.parse(storedTodos) : [];
+  });
+  useEffect(() => {
+    // Save todos to local storage whenever it changes
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }, [todos,completedtodos]);
+  const handleAdd =(e:React.FormEvent)=>{
+    e.preventDefault();
+    if(todo){
+      setTodos([...todos , {id:Date.now(),todo,isDone:false}])
+      setTodo("")
+    }
+  }
+  return <div className="App">
+     <span className="heading">Monumentum</span>
+     <InputField todo={todo} setTodo={setTodo} handleAdd={handleAdd}/>
+     <TodoList todos={todos} setTodos={setTodos} completedtodos={completedtodos} setcompletedTodos={setCompletedTodos}/>
+    
+  </div>
 }
 
-export default App;
+export default App
